@@ -8,7 +8,7 @@ app.use(bodyParser.json());
 
 function findIndex(arr, id) {
   for (let i = 0; i < arr.length; i++) {
-    if (arr[i].id === id) return i;
+    if (parseInt(arr[i].id) === id) return i;
   }
   return -1;
 }
@@ -30,7 +30,8 @@ app.get('/todos', (req, res) => {
 
 app.get('/todos/:id', (req, res) => {
   fs.readFile("todos.json", "utf8", (err, data) => {
-    if (err) throw err;
+    if (err) throw err; 
+    //  We cannot read a string from a file as a JSON we need to convert the same as a JSON Object.
     const todos = JSON.parse(data);
     const todoIndex = findIndex(todos, parseInt(req.params.id));
     if (todoIndex === -1) {
@@ -51,6 +52,7 @@ app.post('/todos', (req, res) => {
     if (err) throw err;
     const todos = JSON.parse(data);
     todos.push(newTodo);
+    //  We can not write a JSON Object to a file directly , hence we need to convert into a string 
     fs.writeFile("todos.json", JSON.stringify(todos), (err) => {
       if (err) throw err;
       res.status(201).json(newTodo);
@@ -84,7 +86,7 @@ app.delete('/todos/:id', (req, res) => {
 
   fs.readFile("todos.json", "utf8", (err, data) => {
     if (err) throw err;
-    const todos = JSON.parse(data);
+    let todos = JSON.parse(data);
     const todoIndex = findIndex(todos, parseInt(req.params.id));
     if (todoIndex === -1) {
       res.status(404).send();
@@ -103,4 +105,5 @@ app.use((req, res, next) => {
   res.status(404).send();
 });
 
-module.exports = app;
+app.listen(3000);
+// module.exports = app;
